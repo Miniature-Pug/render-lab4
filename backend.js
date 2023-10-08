@@ -1,35 +1,24 @@
-let https = require('https');
+let http = require('https');
 let url = require("url");
 let qs = require("querystring")
+const PORT = process.env.PORT || 3030;
 
 const word_to_definition = {}
 
-https.createServer(function (request, response) {
+http.createServer(function (request, response) {
     let parsed_url = url.parse(request.url, true)
-    console.log("I was here")
-    if (request.method === "GET") {
-        console.log("GET")
-        if (parsed_url.pathname === "/health") {
-            // Respond to /health endpoint with a 200 OK status
-            console.log("Health-check request made")
-            response.writeHead(200, { 'Content-type': 'text/plain' });
-            response.end('OK');
+    if (request.method == "GET") {
+        let word = parsed_url.query["word"]
+        if (word in word_to_definition) {
+            response.writeHead(200, {'Content-type': "text/plain"});
+            response.write(word_to_definition[word]);
+            response.end();
         } else {
-            console.log("Word request made")
-            // Handle your existing GET logic here
-            let word = parsed_url.query["word"]
-            if (word in word_to_definition) {
-                response.writeHead(200, { 'Content-type': 'text/plain' });
-                response.write(word_to_definition[word]);
-                response.end();
-            } else {
-                response.writeHead(400, { 'Content-type': 'text/plain' });
-                response.write(`${word} does not have an existing definition`);
-                response.end();
-            }
+            response.writeHead(400, {'Content-type': "text/plain"});
+            response.write(`${word} does not have an existing definition`);
+            response.end();
         }
-    } else if (request.method === "POST") {
-        console.log("POST")
+    } else if (request.method == "POST") {
         let body = '';
         request.on('data', function (data) {
             body += data;
@@ -51,6 +40,7 @@ https.createServer(function (request, response) {
             }
         });
     }
-}).listen(443);
 
-console.log(`Listening on port 443...`)
+}).listen(PORT);
+
+console.log(`Listening on port ${PORT}...`)
