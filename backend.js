@@ -1,6 +1,7 @@
-let https = require('https');
+let https = require('http');
 let url = require("url");
 let qs = require("querystring")
+const PORT = process.env.PORT || 3030;
 
 const word_to_definition = {}
 
@@ -51,6 +52,7 @@ https.createServer(function (request, response) {
             }
         });
     }
-}).listen(443);
+}).listen(PORT);
 
-console.log("Listening on port 443...")
+console.log(`Listening on port ${PORT}...`)
+
